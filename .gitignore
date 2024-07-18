@@ -1,0 +1,11 @@
+venv_author_book/
+
+.env
+
+*.log
+*.pot
+*.pyc
+*.pyo
+*.pyd
+
+db.sqlite3
