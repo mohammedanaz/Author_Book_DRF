@@ -9,3 +9,5 @@ venv_author_book/
 *.pyd
 
 db.sqlite3
+db.json
+db_utf8.json
