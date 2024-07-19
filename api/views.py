@@ -9,6 +9,7 @@ from .serializers import BookSerializer, AuthorSerializer, UserSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.pagination import PageNumberPagination
+from django.core.cache import cache
 
 
 def get_tokens_for_user(user):
@@ -61,6 +62,27 @@ class ListCreateBookView(generics.ListCreateAPIView):
     serializer_class = BookSerializer
     permission_classes = [IsAuthenticated]
     pagination_class = BookPagination
+
+    def get_queryset(self):
+        '''
+        to add queryset to cache and return cached queryset
+        '''
+        queryset = cache.get('all_books')
+        if not queryset:
+            queryset = Book.objects.all()
+            cache.set('all_books', queryset, timeout=60*15)
+            print('all books queryset added to cache')
+        return queryset
+    
+    def create(self, request, *args, **kwargs):
+        '''
+        to delete 'all_books' from cache whenever a new book is added to model.
+        '''
+        response = super().create(request, *args, **kwargs)
+        if response.status_code == status.HTTP_201_CREATED:
+            cache.delete('all_books')
+            print('all_books cache deleted')
+        return response
 
 
 class UpdateDeleteBook(generics.RetrieveUpdateDestroyAPIView):
