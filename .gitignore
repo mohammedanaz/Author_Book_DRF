@@ -8,6 +8,6 @@ venv_author_book/
 *.pyo
 *.pyd
 
-db.sqlite3
+#db.sqlite3
 db.json
 db_utf8.json
