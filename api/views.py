@@ -96,7 +96,23 @@ class UpdateDeleteBook(generics.RetrieveUpdateDestroyAPIView):
     def destroy(self, request, *args, **kwargs):
         try:
             response = super().destroy(request, *args, **kwargs)
+            if response.status_code == status.HTTP_204_NO_CONTENT:
+                cache.delete('all_books')
+                print('all_books cache deleted')
             return Response({"detail": "Book has been deleted."}, status=status.HTTP_204_NO_CONTENT)
+        except Exception as e:
+            return Response({"error": f"{str(e)}"}, status=status.HTTP_400_BAD_REQUEST)
+        
+    def update(self, request, *args, **kwargs):
+        '''
+        to delete 'all_books' from cache whenever a book is updated in the model.
+        '''
+        try:
+            response = super().update(request, *args, **kwargs)
+            if response.status_code == status.HTTP_200_OK:
+                cache.delete('all_books')
+                print('all_books cache deleted')
+            return response
         except Exception as e:
             return Response({"error": f"{str(e)}"}, status=status.HTTP_400_BAD_REQUEST)
 
